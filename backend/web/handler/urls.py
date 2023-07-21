@@ -11,9 +11,11 @@ urlpatterns = [
     # path('api/movies/random_image/', views.movie_random_image),
     # path('api/movies/random/5/', views.Movie_random_list.as_view()),
     # path('api/movies/random/1/', views.movie_random_new),
+    path('api/users/', views.AvailableUsers.as_view()),
     path('api/movies/image/<int:pk>', views.movie_get_image),
     path('api/submissions/rating/', views.Rating.as_view()),
     path('api/recommendation/<str:pk>/<str:pk_model>', views.Recommendation.as_view()),
+    path('api/recommendations/<str:pk>', views.RecommendationListForUsers.as_view()),
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)

@@ -68,6 +68,20 @@ class RecommendationSerializer(serializers.Serializer):
     recommendation_model = serializers.CharField()
     movies = MovieRankedSerializer(many=True)
 
+class UserRecommendationSerializer(serializers.Serializer):
+    id = serializers.CharField(source='userId')
+    #location = serializers.SomeSerializerField(source='alternate_name')
+    #recommendation_model = serializers.CharField()
+    
+class AllUsersRecommendationSerializer(serializers.Serializer):
+    id = serializers.CharField(source='userId')
+    recommendation_model = serializers.CharField()
+    movies = MovieRankedSerializer(many=True)
+    user_description_short = serializers.CharField()
+    user_description_long = serializers.CharField()
+    #location = serializers.SomeSerializerField(source='alternate_name')
+    #recommendation_model = serializers.CharField()
+
 class UserRankingsSerializer(serializers.Serializer):
     userId = serializers.CharField()
     movieId = serializers.IntegerField()

@@ -1,37 +1,51 @@
-## Personalized Reranker Demo
+## RecViz
+![logo](logo-color.png)
 ### About
-This demo is aimed at demonstrating how a personalized approach can be utilized to adjust the recommendation popularity to the preference of each particular user. Two example users have been selected - one has strong affinity towards "mainstream" and highly popular movies, while the other one is gravitating more towards less popular and niche movies. Traditionally popularity bias mitigation approaches have been exposing every user to less popular items in the same manner to promote less known content. This approach, however, takes into consideration every viewer's watching history attempting to gauge their interest towards popular/unpopular movies and only adjust the recommendation accordingly. Since classic recommender systems are known for recommending mostly popular items to every user, the reranker is expected to have less influence on popularity-aligned users, while the strongest changes are predicted to be observed in the recommendation for the niche items. The algorithm will attempt to lower the general popularity of recommended items, while still retaining an acceptable relevance and accuracy. Note: The users with extremely niche preferences are unfortunately practically treated as outliers - the algorithm has a hard time of finding highly relevant niche items to safely recommend without a significant loss in accuracy.
+RecViz is a demonstrational tool built to receive a dataset containing a
+list of user profiles and pre-generated recommendations, both original ones from a baseline recommender model and post-processed ones. The dataset is inserted as a JSON object following a predefined format. After ingesting such a dataset, the system allows to display one or multiple user profiles on-demand to visually inspect their recommendations.
+The user profiles will show up in the interface together with multiple rows of recommendations, raw or post-processed.
+The platform can be used by researchers, educators, software developers and architects, data scientists and analysts. The interactive interface enables the end user to modify the visualization in the following ways
 
-This Demo is based on the research of PHD Candidate Anastasiia Klimashevskaia @ SFI MediaFutures, UIB, who provided the recommendations and recommender system, and Developed by Research Assistant Snorre Alvsvåg @ SFI MediaFutures, UIB, who provided the full stack application. 
+- The end user can select how many and which user profiles with recommendations they would like to visualize and inspect. A dropdown menu defines the number, while drag-and-drop feature lets the end user to pick user profiles from the list of the available ones.
+
+- If multiple RS models were used to generate multiple recommendation lists for a profile, the end user would be able to select which ones to display in the interface. This way baseline recommendations can be also compared among each other.
+
+- In addition to recommendations any profile descriptions or features can be included to provide more information for the analysis, e.g. user demographics or specific preferences.
+
+The tool is based on the research of <...> , who provided the recommendations and recommender system, and Developed by <...>, who provided the full stack application.
 
 ### contact: 
-**Anastasiia Klimashevskaia** \
-PHD, SFI MediaFutures, University of Bergen \
-anastasiia.klimashevskaia@uib.no
-
-**Snorre Alvsvåg** \
-Research Assistant, SFI MediaFutures, University of Bergen \
-snorre.alvsvag@uib.no
+... To be added 
 
 ## Setup Guide for Demo:
-Following is a guide on how to setup this Demo 
+Following is a guide on how to setup this Demo, you will need docker and docker-compose installed on your machine. If on mac, i recommend brew: 
+- https://brew.sh/
+- https://formulae.brew.sh/formula/docker#default
+- https://formulae.brew.sh/formula/docker-compose#default
+
+On windows i recommend installing WSL and taking it from there:
+- https://learn.microsoft.com/en-us/windows/wsl/install
+- https://gist.github.com/martinsam16/4492957e3bbea34046f2c8b49c3e5ac0
+
+You'll also need a TMDB API key for this project to run, you can find information about this here:
+https://developers.themoviedb.org/3/getting-started/introduction
 
 
 ### Data for demo:
-To download the necesarry datasets into the repo follow the following steps:
+Download the necesarry datasets into the repo to run the demonstration:
 ```bash
 # From github root folder:
 
-curl https://files.grouplens.org/datasets/movielens/ml-25m.zip --output backend/data/ml-25m.zip &&
+curl https://files.grouplens.org/datasets/movielens/ml-latest-small.zip --output backend/data/ml-latest-small.zip &&
 unzip backend/data/ml-latest-small.zip -d backend/data/
 ```
 If you cannot use these terminal commands, you can manually download the dataset using the following link:
-https://files.grouplens.org/datasets/movielens/ml-25m.zip and then unzip the folder. To add it to the project, add it into the `backend/data/...` folder so that it matches the following folder structure:
+https://files.grouplens.org/datasets/movielens/ml-latest-small.zip and then unzip the folder. To add it to the project, add it into the `backend/data/...` folder so that it matches the following folder structure:
 
 ```
 ├── backend
 │   └── data
-│       └── ml-25m
+│       └── ml-latest-small
 │           ├── README.txt
 │           ├── genome-scores.csv
 │           ├── genome-tags.csv
@@ -44,9 +58,6 @@ https://files.grouplens.org/datasets/movielens/ml-25m.zip and then unzip the fol
 
 ### Enviournment Variables:
 In the **root** of the project, add a .env file, and add the following lines:
-
-You'll need a TMDB API key for this project to run, you can find information about this here:
-https://developers.themoviedb.org/3/getting-started/introduction
 ```bash
 TMDB_KEY=''
 DJANGO_SECRET_KEY=''
@@ -58,34 +69,37 @@ DJANGO_DEBUG=True
 From the root of the folder, run `docker-compose up --build`
 
 **Step 2:**
-Before the Demo is ready to run locally, you'll need to do some adjustments:
-Open a new terminal and enter into the web container with the following command:
-`docker exec -it DJANGO /bin/bash`
-
-**Step 3:**
 Load data into database with the following command:
-Here you can choose between script args 25m / 1m or no arguments (-latest-small)
+Here you can choose between the arguments `small, 1m, 25m`, we used small for this demonstration:
 
-`python manage.py runscript csv-input --script-args 25m`
+`docker exec -it VISREC-BACKEND python3 manage.py load-movielens small`
 
 ps: A few failed links are no problem, it happends.
 
-**Step 4:**
+**Step 3:**
 For the Demo we need to populate the database with some users:
-`python manage.py load-recommendations all_recs_and_rerank_2.json`
+`docker exec -it VISREC-BACKEND python3 manage.py load-recommendations all_recs_and_rerank.json`
 
-**Step 5:**
+**Step 4:**
+For our demonstration of the tool, we also run a domain spesific command that calculates and adds descriptions to our users. 
+`docker exec -it VISREC-BACKEND python3 manage.py pbm-add-popularity-descriptions 
+/data/pbm/UG_data.json`
+
+**(Optional) Step 5:**
 Create your super user:
-`python manage.py createsuperuser`
-Here just follow the prompts
+`docker exec -it VISREC-BACKEND python3 manage.py createsuperuser`
+Here just follow the prompts.
+
+**(Optional) Step 6:**
+As we are utilizing the tmdb api, calling to find the img url for each load is rather slow, so we therefore cache the src for each of the movies found in a recommendation. This is not too time consuming as we are using the small movielens dataset with ~1600 movies affected in our recommendations.
+
+`docker exec -it VISREC-BACKEND python3 manage.py cache-recommended-movies`
 
 
-The Demo is now live at 0.0.0.0
-
+**The demo is now available at 0.0.0.0**
 
 ### Running Frontend for Development
-Theres already a built and compiled version of the frontend served through the docker-compose file, so in theory you should not need to touch Node or the frontend. However if you want to make changes or poke around:
-Ensure you have node installed, I've operated with node 18, but node 16 should also sufice.
+Theres already a built and compiled version of the frontend served through the docker-compose file, so you should not need to touch Node or the frontend. However if you want to make changes or poke around:
 
 from `/frontend` folder, run `npm install`
 
@@ -93,9 +107,6 @@ run: `npm run dev`
 
 have fun!
 
-
-#### Developers note:
-At the current iteration of this Demo, images are slow to load, this is simply due to how we find our posters. This is currently a slow process of multiple fetch calls, as no poster nor poster links have been crawled and cached, and therefore results in live crawl and fetch for every movie.  
 
 
 #### Acknowledgements:

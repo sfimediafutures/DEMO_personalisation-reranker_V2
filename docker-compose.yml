@@ -2,7 +2,7 @@ version: '3'
  
 services:
   web:
-    container_name: DJANGO
+    container_name: VISREC-BACKEND
     build:
       context: ./backend
     ports:
@@ -32,10 +32,13 @@ services:
           python3 manage.py makemigrations &&
           python3 manage.py migrate &&
           python3 manage.py collectstatic --no-input &&
-          gunicorn web.wsgi --bind 0.0.0.0:8000"
+          python3 manage.py runserver 0.0.0.0:8000"
     
+
+
+# gunicorn web.wsgi --bind 0.0.0.0:8000
   db:
-    container_name: DB
+    container_name: VISREC-DB
     image: postgres:latest
     environment:
       - POSTGRES_DB=web
@@ -47,37 +50,38 @@ services:
       - django_network
 
   redis:
-    container_name: REDIS
+    container_name: VISREC-REDIS
     image: redis:alpine
     networks:
       - django_network
   
-  celery:
-    container_name: CELERY
-    restart: always
-    build:
-      context: ./backend
-    command: celery -A web.celery worker -l INFO
-    volumes:
-      - ./backend/web:/web
-      - ./backend/data:/data
-    environment:
-      - DB_HOST=db
-      - DB_NAME=web
-      - DB_USER=postgres
-      - DB_PASS=supersecretpassword
-      - TMDB_KEY=${TMDB_KEY}
-      - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
-      - DJANGO_DEBUG=${DJANGO_DEBUG}
-    networks:
-      - django_network
+  # celery:
+  #   container_name: CELERY
+  #   restart: always
+  #   build:
+  #     context: ./backend
+  #   command: celery -A web.celery worker -l INFO
+  #   volumes:
+  #     - ./backend/web:/web
+  #     - ./backend/data:/data
+  #   environment:
+  #     - DB_HOST=db
+  #     - DB_NAME=web
+  #     - DB_USER=postgres
+  #     - DB_PASS=supersecretpassword
+  #     - TMDB_KEY=${TMDB_KEY}
+  #     - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
+  #     - DJANGO_DEBUG=${DJANGO_DEBUG}
+  #   networks:
+  #     - django_network
 
-    depends_on:
-      - db
-      - redis
-      - web
+  #   depends_on:
+  #     - db
+  #     - redis
+  #     - web
+  
   nginx:
-    container_name: NGINX
+    container_name: VISREC-NGINX
     image: nginx
     volumes:
       - ./backend/static:/static
@@ -89,19 +93,6 @@ services:
       - django_network
     depends_on:
       - web
-
-  #astro:
-  #  build: 
-  #    context: ./frontend
-  #  volumes:
-  #        - ./frontend/src:/app/src/
-  #        - ./frontend/public:/app/public/
-  #        - ./frontend/package.json:/app/package.json
-  #        - ./frontend/package-lock.json:/app/package-lock.json
-  #  networks:
-  #  - django_network
-  #  ports:
-  #    - 3000:3000
 
 networks:
   django_network:
