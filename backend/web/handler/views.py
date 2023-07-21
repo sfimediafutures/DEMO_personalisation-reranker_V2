@@ -5,7 +5,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from handler.serializers import (
     SubmissionSerializer, MovieSerializer, MovieSerializerImage,
-    RecommendationSerializer, UserRankingsSerializer
+    RecommendationSerializer, UserRankingsSerializer, UserRecommendationSerializer, AllUsersRecommendationSerializer
     )
 
 from rest_framework import generics, pagination
@@ -56,22 +56,105 @@ class Movie_list(generics.ListAPIView):
     filter_backends = [filters.SearchFilter]
     search_fields = ['^title']
 
-# class Movie_random_list(generics.ListAPIView):
-#     seq = Movies.objects.all()
-#     if seq: queryset = random.choices(seq, k=5) 
-#     else: queryset = []
-#     serializer_class = MovieSerializer  
+class AvailableUsers(APIView):
+    """We are intrested in getting all users to showcase. Due to how 
+    we have set up this application, this is not based from its own user model,
+    but we simply get all users that have been ingested based on recommendation and its connected
+    user id. This needs improvement.
+
+    Args:
+        APIView (Object): RESTFramework object
+    """
+    def get_object(self):
+        # in some edge cases we have several recommendations with the same model from users
+        # to combat this we simply return the latest object.
+        try:
+            return Recommendations.objects.values('userId').distinct()
+        except:
+            raise Http404
+            
+    def get(self, request, format=None, *args, **kwargs):
+        recommendation = self.get_object()
+        serializer = UserRecommendationSerializer(recommendation, many=True)
+        return Response(serializer.data)
+        #return Response(status=status.HTTP_204_NO_CONTENT)
+
+        
+class RecommendationListForUsers(APIView):
+    """This view shows all recommendations for a user. It takes a user ID and an recommendation ID 
+    and queries thereafter. Its ment to provice a recommendation based on these two 
+    variabes. 
+    
+    Args:
+        APIView (Object): RESTFramework object
+    """
+    def get_object(self, pk):
+        # in some edge cases we have several recommendations with the same model from users
+        # to combat this we simply return the latest object.
+        try:
+            return Recommendations.objects.filter(userId=pk)
+        except:
+            raise Http404
+        
+
+    def get(self, request, pk, format=None, *args, **kwargs):
+        """Basic GET request, gets recommendations based on userid and relevant model.
+
+        Args:
+            request (Object): request object
+            pk (str): uniqe userId. 
+            format (REST., optional): Defaults to None. Relevant if data is sent in a special json format.
+
+        Returns:
+            Response: Returns recommendations mathing query or 404
+        """
+        # pk = userId
+        recommendations = self.get_object(pk)
+        print(recommendations)
+        # To be updated
+        # data = []
+        # for rec in recommendations:
+        #     print(rec.userId)
+        #     print({
+        #         "id":rec.userId,
+        #         "model":rec.recommendation_model,
+        #         "movies":rec.movies,
+        #            })
+            
+        # Serialize & Return
+        serializer = AllUsersRecommendationSerializer(recommendations, many=True)
+        return Response(serializer.data)
+        #return Response(status=status.HTTP_204_NO_CONTENT)
+
+    def post(self, request, format=None):
+        serializer = ReccomendationSerializer(data=request.data, many=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+        
 
 class Recommendation(APIView):
+    """This view shows a relevant recommendation. It takes a user ID and an recommendation ID 
+    and queries thereafter. Its ment to provice a recommendation based on these two 
+    variabes. 
+    
+    We could consider creating a view for all based on a user, and all based on a model,
+    this is simply to query the database as wished.
+
+    Args:
+        APIView (Object): RESTFramework object
+    """
     def get_object(self, pk, tk):
-        # in some edge cases we have several recommendations from users
-        # to combat this we simply return one object.
+        # in some edge cases we have several recommendations with the same model from users
+        # to combat this we simply return the latest object.
         if tk:
             try:
                 return Recommendations.objects.filter(userId=pk, recommendation_model=str(tk))[:1].get()
             except:
                 raise Http404
         else:
+            # If no model is specified, get one of these
             try:
                 return Recommendations.objects.filter(userId=pk)[:1].get()
             except:
@@ -79,14 +162,28 @@ class Recommendation(APIView):
         
 
     def get(self, request, pk, format=None, *args, **kwargs):
+        """Basic GET request, gets recommendations based on userid and relevant model.
+
+        Args:
+            request (Object): request object
+            pk (str): uniqe userId. 
+            tk (str): recommenderId grabbed from pk_model in kwargs.
+            format (REST., optional): Defaults to None. Relevant if data is sent in a special json format.
+
+        Returns:
+            Response: Returns recommendations mathing query or 404
+        """
         # pk = userId
         # tk = recommenderId
         tk = self.kwargs.get('pk_model', None)
         recommendation = self.get_object(pk, tk)
 
-        
+        # used to wait for a recommendation to train, not relevant for 
+        # RECSYS demo, but it does not interfere with anything so I'll leave it.
         while recommendation.recommendation_model == 'NaN':
             recommendation = self.get_object(pk)
+            
+        # Serialize & Return
         serializer = RecommendationSerializer(recommendation)
         return Response(serializer.data)
 
@@ -139,8 +236,6 @@ def get_recommendation(request, userid, format=None):
 
     def get_recommendations(userid):
         return
-
-    
     return
 
 @api_view(['GET'])
@@ -151,49 +246,3 @@ def movie_get_image(request,pk, format=None):
     response.json()
     
     return Response(response.json())
-
-
-# @api_view(['GET'])
-# def movie_random_new(request, format=None):
-#     n = Movies.objects.values_list('movieId',flat = True)
-#     pick = random.choices(n, k=5)
-
-#     try:
-#         result = []
-#         for movie in pick:
-#             result.append(Movies.objects.get(movieId = movie))
-#         serializer = MovieSerializer(result, many=True)
-#         return Response(serializer.data)
-#     except Movies.DoesNotExist:
-#         return HttpResponse(status=status.HTTP_404_NOT_FOUND)
-
-
-# Some of the viewmodels i want to do more custom
-# @api_view(['GET'])
-# def movie_random(request, format=None):
-#     n = Movies.objects.values_list('movieId',)
-#     pick = random.choice(n)
-#     try:
-#         result = Movies.objects.get(movieId = pick)
-#         serializer = MovieSerializer(result)
-#         return Response(serializer.data)
-#     except Movies.DoesNotExist:
-#         return HttpResponse(status=status.HTTP_404_NOT_FOUND)
-
-
-# @api_view(['GET'])
-# def movie_random_image(request, format=None):
-#     n = Movies.objects.values_list('movieId',flat = True)
-#     pick = random.choice(n)
-#     try:
-#         result = Movies.objects.get(movieId = pick)
-#         link = 'https://image.tmdb.org/t/p/w500/m9v9m21TZxvnSjppposZcgDNZeG.jpg'
-#         serializer = MovieSerializerImage(result)
-
-#         with urlopen(url='https://api.themoviedb.org/3/movie/343611?api_key='+TMDB_KEY) as response:
-#             movie_details = response.read()
-        
-#         return Response(serializer.data)
-
-#     except Movies.DoesNotExist:
-#         return HttpResponse(status=status.HTTP_404_NOT_FOUND)
