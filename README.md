@@ -37,7 +37,7 @@ Download the necesarry datasets into the repo to run the demonstration:
 # From github root folder:
 
 curl https://files.grouplens.org/datasets/movielens/ml-latest-small.zip --output backend/data/ml-latest-small.zip &&
-unzip backend/data/ml-latest-small.zip
+unzip backend/data/ml-latest-small.zip -d backend/data/
 ```
 If you cannot use these terminal commands, you can manually download the dataset using the following link:
 https://files.grouplens.org/datasets/movielens/ml-latest-small.zip and then unzip the folder. To add it to the project, add it into the `backend/data/...` folder so that it matches the following folder structure:
