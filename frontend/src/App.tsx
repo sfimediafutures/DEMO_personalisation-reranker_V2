@@ -4,6 +4,8 @@ import { DndContext, DragEndEvent } from "@dnd-kit/core";
 import { styled } from "@stitches/react";
 import * as _ from "radash";
 
+
+import githubLogo from "./assets/github_logo.png";
 import { IElement } from "./interfaces/interface";
 import { Column } from "./components/Colums";
 
@@ -131,6 +133,22 @@ export const App = () => {
               </ButtonDown>
             </ColumnButtons>
           </ColumnManagement>
+
+          <GithubLink>
+                <h3>GitHub:</h3>
+                <a href="https://github.com/sfimediafutures/DEMO_personalisation-reranker_V2" target="_blank">
+                <ButtonGithub>
+                  <GitImg src={githubLogo} alt="Image" />
+                </ButtonGithub>
+                </a>
+          </GithubLink>
+          {/* <DemoDescription>
+            RecViz is a demonstrational tool built to receive a dataset containing a list of user profiles
+            and pre-generated recommendations, both original ones from a baseline recommender model and 
+            post-processed ones. The dataset is inserted as a JSON object following a predefined format. 
+            After ingesting such a dataset, the system allows to display one or multiple user profiles
+            on-demand to visually inspect their recommendations.
+          </DemoDescription> */}
         </DashBoard>
         <MainWrapper>
           {COLUMNS.map((column, columnIndex) => (
@@ -150,7 +168,21 @@ export const App = () => {
   );
 };
 
+
+const GitImg = styled("img", {
+  maxWidth: "3rem",
+})
+
 const ColumnManagement = styled("div", {
+  padding: "0 1rem 0 1rem",
+  display: "flex",
+  flexDirection: "row",
+  alignItems: "center",
+  justifyContent: "space-between",
+
+});
+
+const GithubLink = styled("div", {
   padding: "0 1rem 0 1rem",
   display: "flex",
   flexDirection: "row",
@@ -254,3 +286,21 @@ const ButtonUp = styled("button", {
   padding: ".1rem .4rem .1rem .4rem",
   margin: ".1rem",
 });
+
+const ButtonGithub = styled("button", {
+  display: "flex",
+  flexDirection: "row",
+  justifyContent: "center",
+  alignItems: "center",
+  width: 102,
+  height: 30,
+  borderRadius: 6,
+  color: "#FFF",
+  background: "rgba( 255, 255, 255, 0.25)",
+  boxShadow: "0 8px 32px 0 rgba( 255, 255, 255, 0.18 )",
+  backdropFilter: "blur(5px)",
+  border: "1px solid rgba( 255, 255, 255, 0.18 )",
+  padding: ".1rem .4rem .1rem .4rem",
+  margin: ".1rem",
+});
+

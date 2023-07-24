@@ -12,10 +12,17 @@ The platform can be used by researchers, educators, software developers and arch
 
 - In addition to recommendations any profile descriptions or features can be included to provide more information for the analysis, e.g. user demographics or specific preferences.
 
-The tool is based on the research of <...> , who provided the recommendations and recommender system, and Developed by <...>, who provided the full stack application.
+The tool is based on the research of Anastasiia Klimashevskaia , who provided the recommendations and recommender system, and Developed by Snorre Alvsvåg, who provided the full stack application.
 
 ### contact: 
-... To be added 
+**Anastasiia Klimashevskaia** \
+PHD, SFI MediaFutures, University of Bergen \
+anastasiia.klimashevskaia@uib.no
+
+**Snorre Alvsvåg** \
+Research Assistant, SFI MediaFutures, University of Bergen \
+snorre.alvsvag@uib.no
+
 
 ## Setup Guide for Demo:
 Following is a guide on how to setup this Demo, you will need docker and docker-compose installed on your machine. If on mac, i recommend brew: 
