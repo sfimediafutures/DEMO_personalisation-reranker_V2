@@ -24,7 +24,7 @@ export const DraggableElement: FC<IDraggableElement> = ({ identifier }) => {
     const fetchData = async (identifier: string) => {
       try {
         const response = await fetch(
-          `http://0.0.0.0/api/recommendations/${identifier}`
+          `https://rerank2.demo.mediafutures.no/api/recommendations/${identifier}`
         ); // replace 'URL_HERE' with your API endpoint
         const newData = await response.json();
 

@@ -25,10 +25,11 @@ SECRET_KEY =  os.environ.get('DJANGO_SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DJANGO_DEBUG')
 
-ALLOWED_HOSTS = ['127.0.0.1','localhost:3000','localhost:3001','localhost:3002','0.0.0.0','1.2.3.4','localhost:5173']
+ALLOWED_HOSTS = ['rerank2.demo.mediafutures.no','127.0.0.1','localhost:3000','localhost:3001','localhost:3002','0.0.0.0','1.2.3.4','localhost:5173']
 
 
 CORS_ALLOWED_ORIGINS = [
+    'https://rerank2.demo.mediafutures.no/',
     'http://localhost:3000',
     'http://localhost:3001',
     'http://localhost:3002',
