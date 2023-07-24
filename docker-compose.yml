@@ -32,7 +32,7 @@ services:
           python3 manage.py makemigrations &&
           python3 manage.py migrate &&
           python3 manage.py collectstatic --no-input &&
-          python3 manage.py runserver 0.0.0.0:8000"
+          gunicorn web.wsgi --bind 0.0.0.0:8000"
     
 
 
@@ -80,19 +80,19 @@ services:
   #     - redis
   #     - web
   
-  nginx:
-    container_name: VISREC-NGINX
-    image: nginx
-    volumes:
-      - ./backend/static:/static
-      - ./frontend/dist:/var/www/html
-      - ./backend/nginx.conf:/etc/nginx/conf.d/default.conf
-    ports:
-      - 80:80
-    networks:
-      - django_network
-    depends_on:
-      - web
+  # nginx:
+  #   container_name: VISREC-NGINX
+  #   image: nginx
+  #   volumes:
+  #     - ./backend/static:/static
+  #     - ./frontend/dist:/var/www/html
+  #     - ./backend/nginx.conf:/etc/nginx/conf.d/default.conf
+  #   ports:
+  #     - 80:80
+  #   networks:
+  #     - django_network
+  #   depends_on:
+  #     - web
 
 networks:
   django_network:
