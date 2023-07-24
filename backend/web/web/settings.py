@@ -29,7 +29,7 @@ ALLOWED_HOSTS = ['rerank2.demo.mediafutures.no','127.0.0.1','localhost:3000','lo
 
 
 CORS_ALLOWED_ORIGINS = [
-    'https://rerank2.demo.mediafutures.no/',
+    'https://rerank2.demo.mediafutures.no',
     'http://localhost:3000',
     'http://localhost:3001',
     'http://localhost:3002',
