@@ -58,7 +58,7 @@ export const App = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch("http://0.0.0.0/api/users"); // replace 'URL_HERE' with your API endpoint
+        const response = await fetch("https://rerank2.demo.mediafutures.no/api/users"); // replace 'URL_HERE' with your API endpoint
         const newData = await response.json();
 
         // Set the state with the new data

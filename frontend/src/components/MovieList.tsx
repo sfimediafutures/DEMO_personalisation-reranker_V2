@@ -10,7 +10,7 @@ const FetchImageClausul: FC<any> = ({ cached_img_url, tmdbid, movieIndex }) => {
   useEffect(() => {
     const fetchData = async (tmdbId: number) => {
       try {
-        const response = await fetch(`http://0.0.0.0/api/movies/image/${tmdbId}`);
+        const response = await fetch(`https://rerank2.demo.mediafutures.no/api/movies/image/${tmdbId}`);
         const data = await response.json();
         return data;
       } catch (error) {
